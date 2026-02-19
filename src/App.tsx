@@ -26,6 +26,8 @@ function App() {
 const [sortBy, setSortBy] = useState<'date' | 'priority'>('date');
   const [filterTag, setFilterTag] = useState<string>('');
 
+  const upcomingDeadlines = tasks.filter(task => !task.completed && task.completedAt).sort((a,b) => new Date(a.completedAt!).getTime() - new Date(b.completedAt!).getTime()).slice(0,3);
+  
   const availableTags = Array.from(new Set(tasks.flatMap(task => task.tags)));
 
   const handleAddTask = (task: {
