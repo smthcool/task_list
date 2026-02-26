@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { TaskForm } from './components/TaskForm';
 import { TaskList } from './components/TaskList';
 import { Card, Space, Select, Button } from 'antd';
-
+import { EditTaskModal } from './components/EditTaskModal';
 const { Option } = Select;
 
 function App() {
@@ -23,12 +23,13 @@ function App() {
       tags: ['учеба', 'разработка']
     }
   ]);
-const [sortBy, setSortBy] = useState<'date' | 'priority'>('date');
-  const [filterTag, setFilterTag] = useState<string>('');
 
+  const [sortBy, setSortBy] = useState<'date' | 'priority'>('date');
+  const [filterTag, setFilterTag] = useState<string>('');
   const upcomingDeadlines = tasks.filter(task => !task.completed && task.completedAt).sort((a,b) => new Date(a.completedAt!).getTime() - new Date(b.completedAt!).getTime()).slice(0,3);
-  
   const availableTags = Array.from(new Set(tasks.flatMap(task => task.tags)));
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [editModalVisible, setEditModalVisible] = useState(false);
 
   const handleAddTask = (task: {
     title: string;
@@ -65,10 +66,10 @@ const [sortBy, setSortBy] = useState<'date' | 'priority'>('date');
 
   const handleEditTask = (id: string) => {
     // Находим задачу для редактирования
-    const taskToEdit = tasks.find(task => task.id === id);
-    if (taskToEdit) {
-      // Здесь можно открыть модальное окно или форму для редактирования
-      console.log('Edit task:', taskToEdit);
+    const task = tasks.find(task => task.id === id);
+    if (task) {
+      setEditingTask(task);
+      setEditModalVisible(true);
     }
   };
 
@@ -85,6 +86,13 @@ const [sortBy, setSortBy] = useState<'date' | 'priority'>('date');
     setFilterTag('');
   };
 
+  const handleSaveEdit = (updatedTask: Partial<Task>) =>{
+    if (editingTask) {
+      setTasks(tasks.map(task => task.id === editingTask.id ? {...task, ...updatedTask}:task))
+    }
+    setEditModalVisible(false);
+    setEditingTask(null);
+  }
   return (
     <Card title="Список задач">
       <Space direction="vertical" size="middle" style={{ width: '100%' }}>
@@ -125,6 +133,15 @@ const [sortBy, setSortBy] = useState<'date' | 'priority'>('date');
           sortBy={sortBy}
           filterTag={filterTag === 'all' ? undefined : filterTag}
         />
+        <EditTaskModal
+        task = {editingTask}
+        visible={editModalVisible}
+        onCancel={() => {
+          setEditModalVisible(false);
+          setEditingTask(null);
+        }}
+        onSave={handleSaveEdit}
+        ></EditTaskModal>
       </Space>
     </Card>
   );
