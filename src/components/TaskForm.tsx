@@ -1,6 +1,19 @@
-import React, {useState} from 'react';
-import { TaskPriority} from '../types';
+import React, {useEffect, useState} from 'react';
+import { TaskPriority, TimeRemaining} from '../types/types';
 import { Button, Card, DatePicker, Form, Input, message, Select, Space, Typography } from 'antd';
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import 'dayjs/locale/ru';
+
+dayjs.extend(duration);
+dayjs.extend(relativeTime);
+dayjs.locale('ru');
+
+const {Option} = Select;
+const {TextArea} = Input;
+const {Title, Text} = Typography;
+const {RangePicker} = DatePicker;
 
 interface TaskFormProps {
     onAddTask: (task: {
@@ -8,6 +21,7 @@ interface TaskFormProps {
         description: string;
         completed: boolean;
         priority: TaskPriority;
+        deadline?: Date;
         estimatedMinutes?: number;
         tags: string[];
     }) => void
@@ -29,6 +43,57 @@ export const TaskForm: React.FC<TaskFormProps> = ({onAddTask}) => {
   const [priority, setPriority] = useState<TaskPriority>('medium');
   const [estimatedMinutes, setEstimatedMinutes] = useState<number>(30);
   const [tags, setTags] = useState<string[]>(['работа']);
+  const [deadline, setDeadline] = useState<dayjs.Dayjs | null>(dayjs().add(1, 'day').hour(1).minute(59).second(59));
+  const [timeRemaining, setTimeRemaining] = useState<TimeRemaining | null>(null);
+
+   useEffect(() => {
+    if (!deadline) {
+      setTimeRemaining(null);
+      return;
+    }
+    calculateTimeRemaining();
+    const interval = setInterval(calculateTimeRemaining, 1000);
+    return () => clearInterval(interval);
+  }, [deadline]);
+
+  const calculateTimeRemaining = () => {
+
+    if (!deadline) {
+      setTimeRemaining(null);
+      return;
+    }
+
+    const now = dayjs();
+    const diffSeconds = deadline.diff(now, 'second');
+    if (diffSeconds <= 0) {
+      setTimeRemaining({
+        days: 0,
+        hours: 0,
+        minutes: 0,
+        seconds: 0,
+        totalHours: 0,
+        isOverdue: true
+      });
+      return;
+    }
+    
+    const duration = dayjs.duration(diffSeconds, 'seconds');
+    const days = Math.floor(duration.asDays());
+    const hours = duration.hours();
+    const minutes = duration.minutes();
+    const seconds = duration.seconds();
+    const totalHours = Math.round(duration.asHours() * 10) / 10;
+
+    setTimeRemaining({
+      days,
+      hours,
+      minutes,
+      seconds,
+      totalHours,
+      isOverdue: false
+    });
+  }
+
 
   const handleSubmit = (e: React.FormEvent) => {
     if (!title.trim()) {
@@ -119,13 +184,26 @@ export const TaskForm: React.FC<TaskFormProps> = ({onAddTask}) => {
           </Select>
         </Form.Item>
 
-        <Form.Item label="Примерное время (минуты)">
-          <Input 
-            type="number"
-            value={estimatedMinutes}
-            onChange={(e) => setEstimatedMinutes(Number(e.target.value))}
-            min={1}
-          />
+        <Form.Item 
+          label="Срок выполнения"
+          extra="Выберите дату и время, к которому нужно выполнить задачу"
+        >
+          <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+            <DatePicker 
+              showTime={{
+                format: 'HH:mm',
+                defaultValue: dayjs('23:59', 'HH:mm')
+              }}
+              format="DD.MM.YYYY HH:mm"
+              value={deadline}
+              onChange={(date) => setDeadline(date)}
+              style={{ width: '100%' }}
+              size="large"
+              placeholder="Выберите дату и время"
+              disabledDate={(current) => current && current < dayjs().startOf('day')}
+            />
+            
+          </Space>
         </Form.Item>
 
         <Form.Item label="Теги">

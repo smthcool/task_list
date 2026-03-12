@@ -1,5 +1,7 @@
 export type TaskPriority = 'low' | 'medium' | 'high';
 
+export type TaskStatus = 'todo' | 'in progress' | 'done';
+
 export interface Task {
     id: string;
     title: string;
@@ -9,6 +11,7 @@ export interface Task {
     createAt: Date;
     completedAt?: Date;
     estimatedMinutes?: number;
+    deadline?: Date;
     tags: string[];
 }
 
@@ -24,4 +27,11 @@ export interface Analytics {
     };
 }
 
-export type SortOption = 'date' | 'priority' | 'title';
+export interface TimeRemaining {
+    days: number;
+    hours: number;
+    minutes: number;
+    seconds: number;
+    totalHours: number;
+    isOverdue: boolean;
+}

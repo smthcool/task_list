@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { List, Checkbox, Button, Tag, Typography, Modal, Space, message } from 'antd';
-import { Task, TaskPriority } from '../types';
+import { Task, TaskPriority } from '../types/types';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 
 const { Text, Paragraph } = Typography;

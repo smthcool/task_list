@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react'
-import { Task, TaskPriority } from '../types';
+import { Task, TaskPriority } from '../types/types';
 import { Form, Input, message, Modal, Select } from 'antd';
 
 const {Option} = Select;
@@ -71,54 +71,55 @@ return (
          label="Название задачи"
          rules={[{ required: true, message: 'Пожалуйста, введите название задачи' }]}
          >
-                    <Input placeholder="Введите название задачи" />
-                  </Form.Item>
+            <Input placeholder="Введите название задачи" />
+        </Form.Item>
         
-                  <Form.Item
-                    name="description"
-                    label="Описание"
-                  >
-                    <TextArea 
-                      placeholder="Введите описание задачи" 
-                      rows={4}
-                    />
-                  </Form.Item>
+        <Form.Item
+            name="description"
+            label="Описание"
+        >
+            <TextArea 
+                placeholder="Введите описание задачи" 
+                rows={4}
+            />
+        </Form.Item>
+
+        <Form.Item
+            name="priority"
+            label="Приоритет"
+        >
+            <Select placeholder="Приоритет">
+                {priorityOptions.map(option => (
+                    <Option key={option.value} value={option.value}>
+                        {option.label}
+                    </Option>
+                ))}
+            </Select>
+        </Form.Item>
         
-                  <Form.Item
-                    name="priority"
-                    label="Приоритет"
-                    initialValue="medium"
-                  >
-                    <Select
-                      mode="multiple"
-                      placeholder="Выберите тег"
-                      options={priorityOptions.map(tag => ({label: tag, value: tag}))}
-                      />
-                  </Form.Item>
-        
-                  <Form.Item
-                    name="estimatedMinutes"
-                    label="Примерное время (минуты)"
-                  >
-                    <Input 
-                      type="number" 
-                      min={1} 
-                      placeholder="Введите время в минутах"
-                    />
-                  </Form.Item>
-        
-                  <Form.Item
-                    name="tags"
-                    label="Теги"
-                  >
-                    <Select
-                      mode="multiple"
-                      placeholder="Выберите теги"
-                      options={defaultTags.map(tag => ({ label: tag, value: tag }))}
-                    />
-                  </Form.Item>
+        <Form.Item
+            name="estimatedMinutes"
+            label="Примерное время (минуты)"
+        >
+            <Input 
+                type="number" 
+                min={1} 
+                placeholder="Введите время в минутах"
+            />
+        </Form.Item>
+
+        <Form.Item
+            name="tags"
+            label="Теги"
+        >
+            <Select
+                mode="multiple"
+                placeholder="Выберите теги"
+                options={defaultTags.map(tag => ({ label: tag, value: tag }))}
+            />
+        </Form.Item>
         </Form>
 
         </Modal>
-
-)}
+    );
+}

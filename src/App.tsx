@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import { TaskItem } from './components/TaskItem';
-import { SortOption, Task, TaskPriority } from './types';
+import { Task, TaskPriority } from './types/types';
 import { v4 as uuidv4 } from 'uuid';
 import { TaskForm } from './components/TaskForm';
 import { TaskList } from './components/TaskList';

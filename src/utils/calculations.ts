@@ -1,4 +1,4 @@
-import { Task } from "../types";
+import { Task } from "../types/types";
 
 export const calculations = () => {
   // ваш код
